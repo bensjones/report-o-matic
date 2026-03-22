@@ -816,6 +816,101 @@ hr.div { border: none; border-top: 1.5px solid var(--border-lt); margin: 18px 0;
 /* ── SECTION VISIBILITY ── */
 .app-section { display: none; }
 .app-section.visible { display: block; }
+
+/* ── STATE SWITCHER ── */
+.state-switcher {
+  position: relative;
+  display: inline-block;
+}
+.state-switcher-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  background: rgba(192,120,48,.22);
+  border: 1px solid rgba(192,120,48,.45);
+  border-radius: 4px;
+  padding: 3px 10px 3px 10px;
+  font-family: 'Space Mono', monospace;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--copper-lt);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+  user-select: none;
+}
+.state-switcher-btn:hover {
+  background: rgba(192,120,48,.35);
+  border-color: var(--copper-lt);
+}
+.state-switcher-btn .caret {
+  font-size: 9px;
+  opacity: 0.7;
+  transition: transform 0.15s;
+}
+.state-switcher-btn.open .caret { transform: rotate(180deg); }
+.state-dropdown {
+  display: none;
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  background: var(--dark);
+  border: 1.5px solid var(--copper-dk);
+  border-radius: 6px;
+  overflow: hidden;
+  min-width: 260px;
+  z-index: 1000;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+}
+.state-dropdown.open { display: block; }
+.state-dropdown-header {
+  font-family: 'Space Mono', monospace;
+  font-size: 9.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: rgba(247,240,227,.4);
+  padding: 8px 14px 4px;
+  border-bottom: 1px solid rgba(255,255,255,.07);
+}
+.state-option {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 10px 14px;
+  cursor: pointer;
+  border-bottom: 1px solid rgba(255,255,255,.05);
+  transition: background 0.12s;
+}
+.state-option:last-child { border-bottom: none; }
+.state-option:hover { background: rgba(192,120,48,.18); }
+.state-option.active { background: rgba(192,120,48,.22); }
+.state-option-name {
+  font-family: 'Space Mono', monospace;
+  font-size: 11.5px;
+  font-weight: 700;
+  color: var(--parch);
+  letter-spacing: 0.04em;
+}
+.state-option-report {
+  font-size: 11px;
+  color: rgba(247,240,227,.5);
+  margin-top: 2px;
+  line-height: 1.4;
+}
+.state-option-form {
+  font-family: 'Space Mono', monospace;
+  font-size: 9.5px;
+  color: var(--copper-lt);
+  margin-top: 3px;
+  opacity: 0.8;
+}
+.state-coming-soon {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+.state-coming-soon:hover { background: transparent; }
+
 </style>
 </head>
 <body>
@@ -827,15 +922,55 @@ hr.div { border: none; border-top: 1.5px solid var(--border-lt); margin: 18px 0;
       <div class="header-app-name">Report-o-<em>matic</em></div>
       <span class="header-divider"></span>
       <div class="header-report-context">
-        <span class="header-state-badge">Florida</span>
-        <span class="header-report-name">Craft Distillery Monthly Report — DBPR EDS Submission</span>
+        <div class="state-switcher" id="stateSwitcher">
+        <div class="state-switcher-btn" id="stateSwitcherBtn" onclick="toggleStateSwitcher()">
+          <span id="activeStateName">Florida</span>
+          <span class="caret">&#9660;</span>
+        </div>
+        <div class="state-dropdown" id="stateDropdown">
+          <div class="state-dropdown-header">Select State Report</div>
+          <div class="state-option active" id="opt-fl" onclick="switchState('fl')">
+            <div>
+              <div class="state-option-name">Florida</div>
+              <div class="state-option-report">Craft Distillery Monthly Report — DBPR EDS</div>
+              <div class="state-option-form">Form DBPR ABT 4000A-110CD · Due 10th</div>
+            </div>
+          </div>
+          <div class="state-option" id="opt-ca" onclick="switchState('ca')">
+            <div>
+              <div class="state-option-name">California</div>
+              <div class="state-option-report">Distilled Spirits Tax Return — CDTFA</div>
+              <div class="state-option-form">Form CDTFA-501-DS · Due 15th</div>
+            </div>
+          </div>
+          <div class="state-option state-coming-soon">
+            <div>
+              <div class="state-option-name">Texas</div>
+              <div class="state-option-report">Coming soon</div>
+            </div>
+          </div>
+          <div class="state-option state-coming-soon">
+            <div>
+              <div class="state-option-name">New York</div>
+              <div class="state-option-report">Coming soon</div>
+            </div>
+          </div>
+          <div class="state-option state-coming-soon">
+            <div>
+              <div class="state-option-name">Colorado</div>
+              <div class="state-option-report">Coming soon</div>
+            </div>
+          </div>
+        </div>
       </div>
-      <div class="header-form-ref" style="margin-top:4px;">Form DBPR ABT 4000A-110CD · §61A-4.009 FAC · Division of Alcoholic Beverages &amp; Tobacco</div>
+        <span class="header-report-name" id="headerReportName">Craft Distillery Monthly Report — DBPR EDS Submission</span>
+      </div>
+      <div class="header-form-ref" style="margin-top:4px;" id="headerFormRef">Form DBPR ABT 4000A-110CD · §61A-4.009 FAC · Division of Alcoholic Beverages &amp; Tobacco</div>
     </div>
     <div class="header-meta no-print">
       <span class="chip chip-copper">EDS-Compatible Output</span>
-      <span class="chip chip-gray">Due: 10th of Each Month</span>
-      <span class="chip chip-gray">Craft Distillery (DD / ERB)</span>
+      <span class="chip chip-gray" id="headerDueChip">Due: 10th of Each Month</span>
+      <span class="chip chip-gray" id="headerLicenseChip">Craft Distillery (DD / ERB)</span>
     </div>
   </div>
 </header>
@@ -873,7 +1008,7 @@ hr.div { border: none; border-top: 1.5px solid var(--border-lt); margin: 18px 0;
 
     <div class="sidebar-info">
       <strong>Compliance Reminder</strong>
-      Monthly reports must be submitted via DBPR EDS by <span class="due">11:59 PM on the 10th</span> of the following month (§61A-4.009 FAC). If the 10th falls on a weekend or holiday, the next business day applies.
+      <span id="complianceText">Monthly reports must be submitted via DBPR EDS by <span class="due">11:59 PM on the 10th</span> of the following month (§61A-4.009 FAC). If the 10th falls on a weekend or holiday, the next business day applies.</span>
       <br><br>
       <strong style="margin-top:8px;">EDS Support</strong>
       <span style="color:var(--copper-lt);"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="a1c4c5d28fd2d4d1d1ced3d5e1ccd8c7cdced3c8c5c0cdc8c2c4cfd2c48fc2cecc">[email&#160;protected]</a></span>
@@ -899,9 +1034,9 @@ hr.div { border: none; border-top: 1.5px solid var(--border-lt); margin: 18px 0;
               <input type="text" id="g_bizname" placeholder="Sunshine Spirits LLC" />
             </div>
             <div class="field">
-              <label>FL License Number <span class="req">*</span></label>
+              <label id="licNumLabel">FL License Number <span class="req">*</span></label>
               <input type="text" id="g_licnum" placeholder="57-DD-000000" />
-              <span class="hint">DD or ERB license</span>
+              <span class="hint" id="licNumHint">DD or ERB license</span>
             </div>
             <div class="field">
               <label>Amended Report?</label>
@@ -1162,7 +1297,7 @@ hr.div { border: none; border-top: 1.5px solid var(--border-lt); margin: 18px 0;
                   <th>#</th>
                   <th>Section</th>
                   <th>Type</th>
-                  <th>FL License / Name</th>
+                  <th id="txn-lic-header">FL License / Name</th>
                   <th>Invoice #</th>
                   <th>Invoice Date</th>
                   <th>Gallons</th>
@@ -1241,7 +1376,7 @@ hr.div { border: none; border-top: 1.5px solid var(--border-lt); margin: 18px 0;
 
           <!-- BOTTLING -->
           <div class="inv-pane" id="inv-bottling">
-            <p style="font-size:12.5px;color:var(--muted);margin-bottom:14px;">Bottling activity converts <strong>proof gallons → wine gallons</strong> for tax purposes. Wine Gal = Proof Gal ÷ Proof. These ABV tiers determine the Florida excise tax rate per §565.12 F.S.</p>
+            <p style="font-size:12.5px;color:var(--muted);margin-bottom:14px;">Bottling activity converts <strong>proof gallons → wine gallons</strong> for tax purposes. Wine Gal = Proof Gal ÷ Proof. <span id="bottlingTaxNote">These ABV tiers determine the Florida excise tax rate per §565.12 F.S.</span></p>
             <div class="form-grid g3">
               <div class="field">
                 <label>Beginning Bottled Inventory (Proof Gal)</label>
@@ -1262,24 +1397,24 @@ hr.div { border: none; border-top: 1.5px solid var(--border-lt); margin: 18px 0;
               <div class="field">
                 <label>Under 17.259% ABV (Wine Gal)</label>
                 <input type="number" id="cat_low" step="0.001" value="0" oninput="recalcTax()" />
-                <span class="hint">Rate: $2.25/gal (ch. 564 F.S.)</span>
+                <span class="hint" id="cat-low-hint">Rate: $2.25/gal (ch. 564 F.S.)</span>
               </div>
               <div class="field">
                 <label>17.259% – 55.780% ABV (Wine Gal)</label>
                 <input type="number" id="cat_mid" step="0.001" value="0" oninput="recalcTax()" />
-                <span class="hint">Rate: $6.50/gal (§565.12(1) F.S.)</span>
+                <span class="hint" id="cat-mid-hint">Rate: $6.50/gal (§565.12(1) F.S.)</span>
               </div>
               <div class="field">
                 <label>Over 55.780% ABV (Wine Gal)</label>
                 <input type="number" id="cat_high" step="0.001" value="0" oninput="recalcTax()" />
-                <span class="hint">Rate: $9.53/gal (§565.12(2) F.S.)</span>
+                <span class="hint" id="cat-high-hint">Rate: $9.53/gal (§565.12(2) F.S.)</span>
               </div>
             </div>
           </div>
 
           <!-- CASE GOODS -->
           <div class="inv-pane" id="inv-casegoods">
-            <p style="font-size:12.5px;color:var(--muted);margin-bottom:14px;">Case goods are bottled spirits tracked in <strong>gallons (wine gallons)</strong>. A craft distillery may sell directly to consumers per §565.03(2) up to 75,000 gallons/year from its gift shop/tasting room.</p>
+            <p style="font-size:12.5px;color:var(--muted);margin-bottom:14px;">Case goods are bottled spirits tracked in <strong>gallons (wine gallons)</strong>. <span id="caseGoodsNote">A craft distillery may sell directly to consumers per §565.03(2) up to 75,000 gallons/year from its gift shop/tasting room.</span></p>
             <div class="form-grid g3">
               <div class="field">
                 <label>Beginning Case Goods Inv. (Gal)</label>
@@ -1326,7 +1461,7 @@ hr.div { border: none; border-top: 1.5px solid var(--border-lt); margin: 18px 0;
         <div class="panel-head">
           <div class="panel-head-text">
             <h2>Tax Computation</h2>
-            <p>EDS Computation of Tax tab — Florida excise taxes per §565.12 F.S.</p>
+            <p id="taxPanelSub">EDS Computation of Tax tab — Florida excise taxes per §565.12 F.S.</p>
           </div>
           <div class="panel-head-actions">
             <button class="btn btn-ghost btn-sm" onclick="recalcTax()">Recalculate</button>
@@ -1364,19 +1499,19 @@ hr.div { border: none; border-top: 1.5px solid var(--border-lt); margin: 18px 0;
               <div style="font-family:'Space Mono',monospace;font-size:10px;text-transform:uppercase;letter-spacing:0.06em;color:var(--dark);font-weight:600;text-align:right;">Tax Due</div>
             </div>
             <div class="tax-row">
-              <div class="tax-label">Spirits under 17.259% ABV<small>§564 rate applies (ch.564 F.S.) — e.g. low-ABV liqueurs, RTDs</small></div>
+              <div class="tax-label" id="tr-low-label">Spirits under 17.259% ABV<small>§564 rate applies (ch.564 F.S.) — e.g. low-ABV liqueurs, RTDs</small></div>
               <div class="tax-gal" id="tr-low-gal">0.000</div>
               <div class="tax-rate">$2.25</div>
               <div class="tax-due" id="tr-low-due">$0.00</div>
             </div>
             <div class="tax-row">
-              <div class="tax-label">Spirits 17.259% – 55.780% ABV<small>§565.12(1) F.S. — standard spirits: whiskey, rum, vodka, gin, tequila</small></div>
+              <div class="tax-label" id="tr-mid-label">Spirits 17.259% – 55.780% ABV<small>§565.12(1) F.S. — standard spirits: whiskey, rum, vodka, gin, tequila</small></div>
               <div class="tax-gal" id="tr-mid-gal">0.000</div>
               <div class="tax-rate">$6.50</div>
               <div class="tax-due" id="tr-mid-due">$0.00</div>
             </div>
             <div class="tax-row">
-              <div class="tax-label">Spirits over 55.780% ABV<small>§565.12(2) F.S. — high-proof spirits: overproofs, navy strength, cask strength</small></div>
+              <div class="tax-label" id="tr-high-label">Spirits over 55.780% ABV<small>§565.12(2) F.S. — high-proof spirits: overproofs, navy strength, cask strength</small></div>
               <div class="tax-gal" id="tr-high-gal">0.000</div>
               <div class="tax-rate">$9.53</div>
               <div class="tax-due" id="tr-high-due">$0.00</div>
@@ -1390,7 +1525,7 @@ hr.div { border: none; border-top: 1.5px solid var(--border-lt); margin: 18px 0;
           </div>
 
           <p style="font-size:11.5px;color:var(--muted);margin-top:12px;font-style:italic;">
-            Note: Tax rates shown are statutory rates per Ch. 564–565 F.S. Verify current rates with DBPR before remitting. Federal TTB taxes apply separately. Credits may reduce amount owed — click "View Credits" in EDS after uploading. Tax is calculated on wine gallons (total volume), not proof gallons.
+            <span id="taxNoteText">Note: Tax rates shown are statutory rates per Ch. 564–565 F.S. Verify current rates with DBPR before remitting. Federal TTB taxes apply separately. Credits may reduce amount owed — click "View Credits" in EDS after uploading. Tax is calculated on wine gallons (total volume), not proof gallons.</span>
           </p>
         </div>
       </div>
@@ -1427,6 +1562,172 @@ hr.div { border: none; border-top: 1.5px solid var(--border-lt); margin: 18px 0;
 
 <!-- ═══════════════════ SCRIPTS ═══════════════════ -->
 <script data-cfasync="false">
+// ───────────────────────────────────────────────
+// STATE CONFIGURATION
+// ───────────────────────────────────────────────
+const STATE_CONFIG = {
+  fl: {
+    name: 'Florida',
+    reportName: 'Craft Distillery Monthly Report — DBPR EDS Submission',
+    formRef: 'Form DBPR ABT 4000A-110CD · §61A-4.009 FAC · Division of Alcoholic Beverages &amp; Tobacco',
+    dueChip: 'Due: 10th of Each Month',
+    licenseChip: 'Craft Distillery (DD / ERB)',
+    licNumLabel: 'FL License Number',
+    licNumPlaceholder: '57-DD-000000',
+    licNumHint: 'DD or ERB license',
+    complianceText: 'Monthly reports must be submitted via DBPR EDS by <span class="due">11:59 PM on the 10th</span> of the following month (§61A-4.009 FAC). If the 10th falls on a weekend or holiday, the next business day applies.',
+    taxPanelSub: 'EDS Computation of Tax tab — Florida excise taxes per §565.12 F.S.',
+    taxTiers: [
+      { id: 'low',  label: 'Spirits under 17.259% ABV',  sub: '§564 rate applies (ch.564 F.S.) — e.g. low-ABV liqueurs, RTDs', rate: 2.25, hint: 'Rate: $2.25/gal (ch. 564 F.S.)' },
+      { id: 'mid',  label: 'Spirits 17.259% – 55.780% ABV', sub: '§565.12(1) F.S. — standard spirits: whiskey, rum, vodka, gin, tequila', rate: 6.50, hint: 'Rate: $6.50/gal (§565.12(1) F.S.)' },
+      { id: 'high', label: 'Spirits over 55.780% ABV',   sub: '§565.12(2) F.S. — high-proof spirits: overproofs, navy strength, cask strength', rate: 9.53, hint: 'Rate: $9.53/gal (§565.12(2) F.S.)' },
+    ],
+    bottlingTaxNote: 'These ABV tiers determine the Florida excise tax rate per §565.12 F.S.',
+    taxCatHeader: 'Taxable Categories (Wine Gallons) — §565.12 F.S.',
+    caseGoodsNote: 'A craft distillery may sell directly to consumers per §565.03(2) up to 75,000 gallons/year from its gift shop/tasting room.',
+    taxNote: 'Note: Tax rates shown are statutory rates per Ch. 564–565 F.S. Verify current rates with DBPR before remitting. Federal TTB taxes apply separately. Credits may reduce amount owed — click "View Credits" in EDS after uploading. Tax is calculated on wine gallons (total volume), not proof gallons.',
+    txnHeaderLicense: 'FL License / Name',
+    sampleDistributors: [
+      { license: '57-DD-009341', name: 'Tampa Bay Wholesale Spirits' },
+      { license: '57-DD-007218', name: 'Gulf &amp; Sun Distributors Inc.' },
+      { license: '57-DD-011094', name: 'Central Florida Beverage LLC' },
+    ],
+    sampleGeneral: {
+      bizname: 'Palmetto Still Craft Distillery LLC', licnum: '57-DD-001842',
+      county: 'Hillsborough', phone: '(813) 555-0192',
+      address: '4401 N. Copper Kettle Way, Tampa, FL 33603',
+    },
+  },
+  ca: {
+    name: 'California',
+    reportName: 'Distilled Spirits Tax Return — CDTFA Alcoholic Beverage Tax',
+    formRef: 'Form CDTFA-501-DS · California Dept. of Tax and Fee Administration · Revenue &amp; Taxation Code §32001',
+    dueChip: 'Due: 15th of Each Month',
+    licenseChip: 'Craft Distiller (Type 74) / DSM (Type 04)',
+    licNumLabel: 'CDTFA Account Number',
+    licNumPlaceholder: '123-456789',
+    licNumHint: 'ABC Type 74 or Type 04 · 9-digit CDTFA account',
+    complianceText: 'California CDTFA-501-DS returns must be filed electronically by <span class="due">11:59 PM on the 15th</span> of the following month (Regulation 2535). A return must be filed each period even if no tax is due.',
+    taxPanelSub: 'CDTFA Tax Computation — California Alcoholic Beverage Tax (Revenue &amp; Taxation Code §32201)',
+    taxTiers: [
+      { id: 'low',  label: '100 Proof and Under',  sub: 'R&TC §32201 — all spirits at or below 100 proof (50% ABV)', rate: 3.30, hint: 'Rate: $3.30/wine gal (R&TC §32201)' },
+      { id: 'mid',  label: 'Over 100 Proof',       sub: 'R&TC §32201 — spirits above 100 proof (over 50% ABV)', rate: 6.60, hint: 'Rate: $6.60/wine gal (R&TC §32201)' },
+      { id: 'high', label: 'Exempt Transactions',  sub: 'Sales to licensed manufacturers, wholesalers, rectifiers, importers; exports; armed forces', rate: 0, hint: 'Rate: $0.00 — claim via CDTFA-243-B / 244-B' },
+    ],
+    bottlingTaxNote: 'California uses two proof tiers: 100 proof and under ($3.30/wine gal) and over 100 proof ($6.60/wine gal) per R&TC §32201.',
+    taxCatHeader: 'Taxable Categories (Wine Gallons) — R&TC §32201',
+    caseGoodsNote: 'California Type 74 craft distillers may sell up to 4.5 liters/consumer/day on-premises, and up to 150,000 gallons/fiscal year total (BPC §23502).',
+    taxNote: 'Note: Tax rates per R&TC §32201 — $3.30/wine gal (≤100 proof) and $6.60/wine gal (>100 proof). Tax is due on sales to in-state retailers and consumer sales by craft distillers. Transfers to other licensed manufacturers, wholesalers, and exports are exempt. Verify current rates at cdtfa.ca.gov.',
+    txnHeaderLicense: 'CDTFA Acct / Name',
+    sampleDistributors: [
+      { license: '400-123456', name: 'Bay Area Spirits Wholesale' },
+      { license: '400-234567', name: 'Southern California Beverage Dist.' },
+      { license: '400-345678', name: 'Golden State Spirits LLC' },
+    ],
+    sampleGeneral: {
+      bizname: 'Golden Gate Craft Distillery LLC', licnum: '400-987654',
+      county: 'San Francisco', phone: '(415) 555-0142',
+      address: '1201 Distillery Row, San Francisco, CA 94103',
+    },
+  },
+};
+
+let activeState = 'fl';
+
+// ── State Switcher ──
+function toggleStateSwitcher() {
+  const btn = document.getElementById('stateSwitcherBtn');
+  const dd  = document.getElementById('stateDropdown');
+  btn.classList.toggle('open');
+  dd.classList.toggle('open');
+}
+
+// Close dropdown when clicking outside
+document.addEventListener('click', function(e) {
+  const sw = document.getElementById('stateSwitcher');
+  if (sw && !sw.contains(e.target)) {
+    document.getElementById('stateSwitcherBtn')?.classList.remove('open');
+    document.getElementById('stateDropdown')?.classList.remove('open');
+  }
+});
+
+function switchState(stateKey) {
+  if (stateKey === activeState) {
+    toggleStateSwitcher();
+    return;
+  }
+  if (transactions.length > 0) {
+    if (!confirm('Switching states will clear all loaded transactions and reset the form. Continue?')) {
+      toggleStateSwitcher();
+      return;
+    }
+    transactions = [];
+    renderTransactions();
+  }
+
+  activeState = stateKey;
+  const cfg = STATE_CONFIG[stateKey];
+
+  // Update active option highlight
+  document.querySelectorAll('.state-option').forEach(el => el.classList.remove('active'));
+  document.getElementById('opt-' + stateKey)?.classList.add('active');
+
+  // Header
+  document.getElementById('activeStateName').textContent = cfg.name;
+  document.getElementById('headerReportName').textContent = cfg.reportName.replace(/&amp;/g,'&');
+  document.getElementById('headerFormRef').innerHTML = cfg.formRef;
+  document.getElementById('headerDueChip').textContent = cfg.dueChip;
+  document.getElementById('headerLicenseChip').textContent = cfg.licenseChip;
+
+  // Compliance sidebar
+  document.getElementById('complianceText').innerHTML = cfg.complianceText;
+
+  // General info
+  document.getElementById('licNumLabel').innerHTML = cfg.licNumLabel + ' <span class="req">*</span>';
+  document.getElementById('g_licnum').placeholder = cfg.licNumPlaceholder;
+  document.getElementById('licNumHint').textContent = cfg.licNumHint;
+  // Clear form fields
+  ['g_bizname','g_licnum','g_month','g_county','g_phone','g_address','g_submitter','g_title'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = '';
+  });
+
+  // Tax panel
+  document.getElementById('taxPanelSub').textContent = cfg.taxPanelSub.replace(/&amp;/g,'&');
+  cfg.taxTiers.forEach(tier => {
+    const labelEl = document.getElementById('tr-' + tier.id + '-label');
+    if (labelEl) labelEl.innerHTML = tier.label + '<small>' + tier.sub + '</small>';
+    const rateEl = document.getElementById('tr-' + tier.id + '-rate');
+    if (rateEl) rateEl.textContent = tier.rate > 0 ? '$' + tier.rate.toFixed(2) : '$0.00';
+    const hintEl = document.getElementById('cat-' + tier.id + '-hint');
+    if (hintEl) hintEl.textContent = tier.hint;
+  });
+  document.getElementById('bottlingTaxNote').innerHTML = cfg.bottlingTaxNote;
+  document.getElementById('taxCatHeader').textContent = cfg.taxCatHeader.replace(/&amp;/g,'&');
+  document.getElementById('caseGoodsNote').innerHTML = cfg.caseGoodsNote;
+  document.getElementById('taxNoteText').textContent = cfg.taxNote.replace(/&amp;/g,'&');
+
+  // Transaction table header
+  const licHeader = document.getElementById('txn-lic-header');
+  if (licHeader) licHeader.textContent = cfg.txnHeaderLicense;
+
+  // Reset inventory fields
+  ['b_begin','b_recv','b_distilled','b_to_bottling','b_to_case','b_loss',
+   'bot_begin','bot_in','bot_out','cat_low','cat_mid','cat_high',
+   'c_begin','c_recv','c_consumer','c_dist','c_tasting','c_export','c_loss'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el && !el.readOnly) el.value = '0';
+  });
+  recalcBulk();
+  recalcCase();
+  recalcTax();
+
+  // Close dropdown & show toast
+  document.getElementById('stateSwitcherBtn')?.classList.remove('open');
+  document.getElementById('stateDropdown')?.classList.remove('open');
+  toast('Switched to ' + cfg.name + ' reporting');
+}
+
 // ───────────────────────────────────────────────
 // STATE
 // ───────────────────────────────────────────────
@@ -2148,31 +2449,37 @@ function recalcCase() {
 // TAX CALCULATION
 // ───────────────────────────────────────────────
 function recalcTax() {
-  const low = v('cat_low'), mid = v('cat_mid'), high = v('cat_high');
-  const tl = low * 2.25, tm = mid * 6.50, th = high * 9.53;
+  const cfg = STATE_CONFIG[activeState];
+  const tiers = cfg.taxTiers;
+  const low  = v('cat_low'),  mid  = v('cat_mid'),  high = v('cat_high');
+  const tl   = low  * tiers[0].rate;
+  const tm   = mid  * tiers[1].rate;
+  const th   = high * tiers[2].rate;
   const total = tl + tm + th;
 
-  document.getElementById('tr-low-gal').textContent = low.toFixed(3);
-  document.getElementById('tr-mid-gal').textContent = mid.toFixed(3);
+  document.getElementById('tr-low-gal').textContent  = low.toFixed(3);
+  document.getElementById('tr-mid-gal').textContent  = mid.toFixed(3);
   document.getElementById('tr-high-gal').textContent = high.toFixed(3);
-  document.getElementById('tr-low-due').textContent = '$' + tl.toFixed(2);
-  document.getElementById('tr-mid-due').textContent = '$' + tm.toFixed(2);
+  document.getElementById('tr-low-due').textContent  = '$' + tl.toFixed(2);
+  document.getElementById('tr-mid-due').textContent  = '$' + tm.toFixed(2);
   document.getElementById('tr-high-due').textContent = '$' + th.toFixed(2);
-  document.getElementById('tr-total').textContent = '$' + total.toFixed(2);
+  document.getElementById('tr-total').textContent    = '$' + total.toFixed(2);
 
   updateStats();
   return total;
 }
 
 function updateStats() {
+  const cfg   = STATE_CONFIG[activeState];
+  const tiers = cfg.taxTiers;
   const totalBulk = v('b_distilled') + v('b_recv');
   const totalWine = v('cat_low') + v('cat_mid') + v('cat_high');
-  const tax = (v('cat_low') * 2.25) + (v('cat_mid') * 6.50) + (v('cat_high') * 9.53);
+  const tax = (v('cat_low') * tiers[0].rate) + (v('cat_mid') * tiers[1].rate) + (v('cat_high') * tiers[2].rate);
 
   document.getElementById('st-txns').textContent = transactions.length;
   document.getElementById('st-bulk').textContent = totalBulk.toFixed(3);
   document.getElementById('st-wine').textContent = totalWine.toFixed(3);
-  document.getElementById('st-tax').textContent = '$' + tax.toFixed(2);
+  document.getElementById('st-tax').textContent  = '$' + tax.toFixed(2);
 }
 
 // ───────────────────────────────────────────────
@@ -2413,16 +2720,18 @@ function toast(msg) {
 // LOAD SAMPLE DATA
 // ───────────────────────────────────────────────
 function loadSampleData() {
+  const cfg = STATE_CONFIG[activeState];
+  const sg  = cfg.sampleGeneral;
   // General Info
-  document.getElementById('g_bizname').value   = 'Palmetto Still Craft Distillery LLC';
-  document.getElementById('g_licnum').value    = '57-DD-001842';
+  document.getElementById('g_bizname').value   = sg.bizname;
+  document.getElementById('g_licnum').value    = sg.licnum;
   document.getElementById('g_month').value     = 'January';
   document.getElementById('g_year').value      = '2025';
-  document.getElementById('g_submitter').value = 'Marcus T. Holloway';
+  document.getElementById('g_submitter').value = activeState === 'ca' ? 'Elena M. Vasquez' : 'Marcus T. Holloway';
   document.getElementById('g_title').value     = 'Owner / Head Distiller';
-  document.getElementById('g_county').value    = 'Hillsborough';
-  document.getElementById('g_phone').value     = '(813) 555-0192';
-  document.getElementById('g_address').value   = '4401 N. Copper Kettle Way, Tampa, FL 33603';
+  document.getElementById('g_county').value    = sg.county;
+  document.getElementById('g_phone').value     = sg.phone;
+  document.getElementById('g_address').value   = sg.address;
   document.getElementById('g_amended').value   = 'No';
   document.getElementById('g_submitdate').value = '2025-02-07';
 
