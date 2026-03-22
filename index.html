@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -912,6 +911,96 @@ hr.div { border: none; border-top: 1.5px solid var(--border-lt); margin: 18px 0;
 }
 .state-coming-soon:hover { background: transparent; }
 
+
+/* ── STATE PANELS ── */
+.state-panel { display: none; }
+.state-panel.state-active { display: block; }
+.ca-note {
+  background: #eff6ff;
+  border: 1.5px solid #93c5fd;
+  border-left: 4px solid #1a5a8a;
+  border-radius: var(--r);
+  padding: 12px 16px;
+  font-size: 13px;
+  color: #1a5a8a;
+  margin-bottom: 16px;
+  line-height: 1.6;
+}
+.ca-note strong { color: #1e3a5f; }
+.schedule-tabs { display: flex; gap: 2px; flex-wrap: wrap; margin-bottom: 0; }
+.schedule-tab {
+  padding: 7px 14px;
+  font-size: 12px;
+  font-weight: 600;
+  border-radius: var(--r) var(--r) 0 0;
+  border: 1.5px solid var(--border-lt);
+  border-bottom: none;
+  cursor: pointer;
+  background: var(--linen);
+  color: var(--muted);
+  font-family: 'Space Mono', monospace;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  transition: all 0.15s;
+}
+.schedule-tab.active { background: white; color: var(--copper-dk); border-color: var(--border); }
+.schedule-pane {
+  display: none;
+  border: 1.5px solid var(--border);
+  border-radius: 0 var(--r) var(--r) var(--r);
+  padding: 18px;
+  background: white;
+}
+.schedule-pane.active { display: block; }
+.schedule-badge {
+  display: inline-block;
+  font-family: 'Space Mono', monospace;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 3px;
+  background: var(--dark);
+  color: var(--parch);
+  letter-spacing: 0.06em;
+  margin-bottom: 10px;
+}
+.stmt-grid {
+  display: grid;
+  grid-template-columns: 36px 1fr 140px 140px;
+  gap: 0;
+  border: 1.5px solid var(--border-lt);
+  border-radius: var(--r);
+  overflow: hidden;
+  font-size: 13px;
+}
+.stmt-header { background: var(--dark); color: var(--parch); font-family: 'Space Mono', monospace; font-size: 10px; text-transform: uppercase; letter-spacing: 0.06em; padding: 8px 12px; border-right: 1px solid rgba(255,255,255,.1); }
+.stmt-header:last-child { border-right: none; }
+.stmt-row { display: contents; }
+.stmt-row > div { padding: 9px 12px; border-bottom: 1px solid var(--border-lt); border-right: 1px solid var(--border-lt); background: white; vertical-align: middle; }
+.stmt-row > div:last-child { border-right: none; }
+.stmt-row:last-child > div { border-bottom: none; }
+.stmt-row.subtotal > div { background: var(--parch); font-weight: 600; }
+.stmt-row.total > div { background: var(--dark); color: var(--parch); font-weight: 700; font-size: 14px; }
+.stmt-line-num { font-family: 'Space Mono', monospace; font-size: 11px; color: var(--copper-dk); font-weight: 700; text-align: center; }
+.stmt-label { color: var(--slate); line-height: 1.4; }
+.stmt-label small { display: block; font-size: 11px; color: var(--muted); font-style: italic; margin-top: 2px; }
+.stmt-input { font-family: 'Space Mono', monospace; font-size: 12.5px; }
+.stmt-input input {
+  width: 100%;
+  border: 1.5px solid var(--border);
+  border-radius: 4px;
+  padding: 5px 8px;
+  font-family: 'Space Mono', monospace;
+  font-size: 12.5px;
+  background: var(--cream);
+  color: var(--ink);
+  outline: none;
+}
+.stmt-input input:focus { border-color: var(--copper); background: white; }
+.stmt-input input[readonly] { background: var(--parch2); color: var(--muted); }
+.stmt-input.auto { font-style: italic; color: var(--muted); padding-top: 11px; }
+.two-col-input { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+
 </style>
 </head>
 <body>
@@ -1107,6 +1196,8 @@ hr.div { border: none; border-top: 1.5px solid var(--border-lt); margin: 18px 0;
         </div>
         <div class="panel-body">
 
+          <!-- FL Import Data -->
+          <div class="state-panel state-active" id="ingest-fl">
           <div class="ingest-tabs">
             <div class="ingest-tab active" onclick="switchIngest('csv', this)">CSV / TSV</div>
             <div class="ingest-tab" onclick="switchIngest('excel', this)">Excel (XLS/XLSX)</div>
@@ -1234,10 +1325,246 @@ hr.div { border: none; border-top: 1.5px solid var(--border-lt); margin: 18px 0;
             <div id="manual-msg" class="msg"></div>
           </div>
 
+          </div><!-- /ingest-fl -->
+
+          <!-- CA Schedule Entry -->
+          <div class="state-panel" id="ingest-ca">
+            <div class="ca-note">
+              <strong>California CDTFA-501-DS — Schedule Entry</strong><br>
+              Enter transactions by schedule. Each schedule corresponds to a supplemental form filed with your CDTFA-501-DS tax return. All quantities in <strong>wine gallons</strong> (multiply liters × 0.264172, round to nearest 0.01 gal).
+            </div>
+            <div class="schedule-tabs">
+              <div class="schedule-tab active" onclick="switchSchedule('240a', this)">240-A Own Bottling</div>
+              <div class="schedule-tab" onclick="switchSchedule('241a', this)">241-A CA Purchases</div>
+              <div class="schedule-tab" onclick="switchSchedule('242a', this)">242-A Imports</div>
+              <div class="schedule-tab" onclick="switchSchedule('243b', this)">243-B Exempt Sales</div>
+              <div class="schedule-tab" onclick="switchSchedule('244b', this)">244-B Exports/Carriers</div>
+            </div>
+
+            <!-- 240-A: Own bottling dept -->
+            <div class="schedule-pane active" id="sched-240a">
+              <span class="schedule-badge">CDTFA-240-A</span>
+              <p style="font-size:12.5px;color:var(--muted);margin-bottom:14px;">Spirits received from your <strong>own bottling or packaging department</strong>. Must agree with TTB federal forms. (Regulation 2504)</p>
+              <div class="form-grid g3">
+                <div class="field">
+                  <label>Owner / Bottled For <span class="req">*</span></label>
+                  <input type="text" id="ca240_owner" placeholder="Your distillery name" />
+                </div>
+                <div class="field">
+                  <label>Date Bottled / Packaged <span class="req">*</span></label>
+                  <input type="date" id="ca240_date" />
+                </div>
+                <div class="field">
+                  <label>Street Address</label>
+                  <input type="text" id="ca240_street" placeholder="123 Distillery Row" />
+                </div>
+                <div class="field">
+                  <label>City</label>
+                  <input type="text" id="ca240_city" placeholder="San Francisco" />
+                </div>
+                <div class="field">
+                  <label>100 Proof &amp; Under (Wine Gal) <span class="req">*</span></label>
+                  <input type="number" id="ca240_low" step="0.01" placeholder="0.00" />
+                </div>
+                <div class="field">
+                  <label>Over 100 Proof (Wine Gal) <span class="req">*</span></label>
+                  <input type="number" id="ca240_high" step="0.01" placeholder="0.00" />
+                </div>
+              </div>
+              <div class="btn-row"><button class="btn btn-primary btn-sm" onclick="addCASchedule('240a')">Add 240-A Record</button></div>
+              <div id="msg-240a" class="msg" style="margin-top:10px;"></div>
+            </div>
+
+            <!-- 241-A: Purchased from CA licensees -->
+            <div class="schedule-pane" id="sched-241a">
+              <span class="schedule-badge">CDTFA-241-A</span>
+              <p style="font-size:12.5px;color:var(--muted);margin-bottom:14px;">Spirits <strong>purchased or received from other CA licensed manufacturers, importers, or wholesalers</strong>. Include returns from CA wholesalers. (Regulation 2505)</p>
+              <div class="form-grid g3">
+                <div class="field">
+                  <label>Purchased From <span class="req">*</span></label>
+                  <input type="text" id="ca241_seller" placeholder="Seller name" />
+                </div>
+                <div class="field">
+                  <label>Seller City <span class="req">*</span></label>
+                  <input type="text" id="ca241_city" placeholder="Los Angeles" />
+                </div>
+                <div class="field">
+                  <label>Seller CDTFA Account # <span class="req">*</span></label>
+                  <input type="text" id="ca241_acct" placeholder="123456789 (numbers only)" />
+                  <span class="hint">9-digit number, no dashes</span>
+                </div>
+                <div class="field">
+                  <label>Date Received <span class="req">*</span></label>
+                  <input type="date" id="ca241_recvdate" />
+                </div>
+                <div class="field">
+                  <label>Invoice Number <span class="req">*</span></label>
+                  <input type="text" id="ca241_invnum" placeholder="INV-001" />
+                </div>
+                <div class="field">
+                  <label>Invoice Date <span class="req">*</span></label>
+                  <input type="date" id="ca241_invdate" />
+                </div>
+                <div class="field">
+                  <label>100 Proof &amp; Under (Wine Gal) <span class="req">*</span></label>
+                  <input type="number" id="ca241_low" step="0.01" placeholder="0.00" />
+                </div>
+                <div class="field">
+                  <label>Over 100 Proof (Wine Gal) <span class="req">*</span></label>
+                  <input type="number" id="ca241_high" step="0.01" placeholder="0.00" />
+                </div>
+              </div>
+              <div class="btn-row"><button class="btn btn-primary btn-sm" onclick="addCASchedule('241a')">Add 241-A Record</button></div>
+              <div id="msg-241a" class="msg" style="margin-top:10px;"></div>
+            </div>
+
+            <!-- 242-A: Imports into CA -->
+            <div class="schedule-pane" id="sched-242a">
+              <span class="schedule-badge">CDTFA-242-A</span>
+              <p style="font-size:12.5px;color:var(--muted);margin-bottom:14px;">Spirits <strong>imported into California</strong> from out-of-state or Foreign Trade Zone. Report at time of importation, not withdrawal from bond. (Regulation 2506)</p>
+              <div class="form-grid g3">
+                <div class="field">
+                  <label>Shipper Name <span class="req">*</span></label>
+                  <input type="text" id="ca242_shipper" placeholder="Shipper / seller name" />
+                </div>
+                <div class="field">
+                  <label>Shipper State <span class="req">*</span></label>
+                  <input type="text" id="ca242_state" placeholder="KY, TX, NY…" maxlength="2" />
+                </div>
+                <div class="field">
+                  <label>Common Carrier Name <span class="req">*</span></label>
+                  <input type="text" id="ca242_carrier" placeholder="Carrier company" />
+                </div>
+                <div class="field">
+                  <label>Mode Code <span class="req">*</span></label>
+                  <select id="ca242_mode">
+                    <option value="J">J — Truck</option>
+                    <option value="R">R — Railcar</option>
+                    <option value="S">S — Ship/Vessel</option>
+                  </select>
+                  <span class="hint">J=Truck, R=Rail, S=Ship</span>
+                </div>
+                <div class="field">
+                  <label>Waybill / Bill of Lading # <span class="req">*</span></label>
+                  <input type="text" id="ca242_waybill" placeholder="BOL-12345" />
+                </div>
+                <div class="field">
+                  <label>Waybill Date</label>
+                  <input type="date" id="ca242_waybilldate" />
+                </div>
+                <div class="field">
+                  <label>Date Received <span class="req">*</span></label>
+                  <input type="date" id="ca242_recvdate" />
+                </div>
+                <div class="field">
+                  <label>Invoice Number <span class="req">*</span></label>
+                  <input type="text" id="ca242_invnum" placeholder="INV-001" />
+                </div>
+                <div class="field">
+                  <label>Purchased From</label>
+                  <input type="text" id="ca242_purchfrom" placeholder="Vendor / seller name" />
+                </div>
+                <div class="field">
+                  <label>100 Proof &amp; Under (Wine Gal) <span class="req">*</span></label>
+                  <input type="number" id="ca242_low" step="0.01" placeholder="0.00" />
+                </div>
+                <div class="field">
+                  <label>Over 100 Proof (Wine Gal) <span class="req">*</span></label>
+                  <input type="number" id="ca242_high" step="0.01" placeholder="0.00" />
+                </div>
+              </div>
+              <div class="btn-row"><button class="btn btn-primary btn-sm" onclick="addCASchedule('242a')">Add 242-A Record</button></div>
+              <div id="msg-242a" class="msg" style="margin-top:10px;"></div>
+            </div>
+
+            <!-- 243-B: Exempt sales to other CA licensees -->
+            <div class="schedule-pane" id="sched-243b">
+              <span class="schedule-badge">CDTFA-243-B</span>
+              <p style="font-size:12.5px;color:var(--muted);margin-bottom:14px;"><strong>Exempt sales / deliveries to other CA licensed manufacturers, importers, or wholesalers.</strong> Do NOT include sales to CA retailers — those are taxable. Also include own-branch transfers and returns to vendors. (Regulation 2507)</p>
+              <div class="form-grid g3">
+                <div class="field">
+                  <label>Sold To <span class="req">*</span></label>
+                  <input type="text" id="ca243_soldto" placeholder="Purchaser name" />
+                </div>
+                <div class="field">
+                  <label>City <span class="req">*</span></label>
+                  <input type="text" id="ca243_city" placeholder="Delivery city" />
+                </div>
+                <div class="field">
+                  <label>Purchaser CDTFA Account # <span class="req">*</span></label>
+                  <input type="text" id="ca243_acct" placeholder="123456789" />
+                  <span class="hint">9-digit, numbers only</span>
+                </div>
+                <div class="field">
+                  <label>Invoice Number <span class="req">*</span></label>
+                  <input type="text" id="ca243_invnum" placeholder="INV-001" />
+                </div>
+                <div class="field">
+                  <label>Invoice Date <span class="req">*</span></label>
+                  <input type="date" id="ca243_invdate" />
+                </div>
+                <div class="field">
+                  <label>Date Shipped <span class="req">*</span></label>
+                  <input type="date" id="ca243_shipdate" />
+                </div>
+                <div class="field">
+                  <label>100 Proof &amp; Under (Wine Gal) <span class="req">*</span></label>
+                  <input type="number" id="ca243_low" step="0.01" placeholder="0.00" />
+                </div>
+                <div class="field">
+                  <label>Over 100 Proof (Wine Gal) <span class="req">*</span></label>
+                  <input type="number" id="ca243_high" step="0.01" placeholder="0.00" />
+                </div>
+              </div>
+              <div class="btn-row"><button class="btn btn-primary btn-sm" onclick="addCASchedule('243b')">Add 243-B Record</button></div>
+              <div id="msg-243b" class="msg" style="margin-top:10px;"></div>
+            </div>
+
+            <!-- 244-B: Exports / common carriers / armed forces -->
+            <div class="schedule-pane" id="sched-244b">
+              <span class="schedule-badge">CDTFA-244-B</span>
+              <p style="font-size:12.5px;color:var(--muted);margin-bottom:14px;">Spirits <strong>exported from California, sold to common carriers in interstate service, or sold to Armed Forces instrumentalities.</strong> Exports must be actually exported within 90 days of sale.</p>
+              <div class="form-grid g3">
+                <div class="field">
+                  <label>Sold / Shipped To <span class="req">*</span></label>
+                  <input type="text" id="ca244_soldto" placeholder="Purchaser / destination" />
+                </div>
+                <div class="field">
+                  <label>Exemption Type <span class="req">*</span></label>
+                  <select id="ca244_type">
+                    <option value="EXPORT">Export from California</option>
+                    <option value="CARRIER">Sale to Common Carrier</option>
+                    <option value="ARMED_FORCES">Sale to Armed Forces</option>
+                  </select>
+                </div>
+                <div class="field">
+                  <label>Invoice Number <span class="req">*</span></label>
+                  <input type="text" id="ca244_invnum" placeholder="INV-001" />
+                </div>
+                <div class="field">
+                  <label>Invoice Date <span class="req">*</span></label>
+                  <input type="date" id="ca244_invdate" />
+                </div>
+                <div class="field">
+                  <label>100 Proof &amp; Under (Wine Gal)</label>
+                  <input type="number" id="ca244_low" step="0.01" placeholder="0.00" />
+                </div>
+                <div class="field">
+                  <label>Over 100 Proof (Wine Gal)</label>
+                  <input type="number" id="ca244_high" step="0.01" placeholder="0.00" />
+                </div>
+              </div>
+              <div class="btn-row"><button class="btn btn-primary btn-sm" onclick="addCASchedule('244b')">Add 244-B Record</button></div>
+              <div id="msg-244b" class="msg" style="margin-top:10px;"></div>
+            </div>
+
+          </div><!-- /ingest-ca -->
+
         </div>
       </div>
 
-      <!-- Transaction type reference -->
+      <!-- Transaction type reference — FL only -->
+      <div class="state-panel state-active" id="txnref-fl">
       <div class="panel">
         <div class="panel-head">
           <div class="panel-head-text">
@@ -1275,6 +1602,7 @@ hr.div { border: none; border-top: 1.5px solid var(--border-lt); margin: 18px 0;
           </div>
         </div>
       </div>
+      </div><!-- /txnref-fl -->
     </section>
 
     <!-- ════ SECTION: TRANSACTIONS ════ -->
@@ -1322,14 +1650,16 @@ hr.div { border: none; border-top: 1.5px solid var(--border-lt); margin: 18px 0;
       <div class="panel">
         <div class="panel-head">
           <div class="panel-head-text">
-            <h2>Inventory Summary</h2>
-            <p>EDS Summary Tab — beginning inventory loads from prior month; grey fields auto-calculate</p>
+            <h2 id="inv-panel-title">Inventory Summary</h2>
+            <p id="inv-panel-sub">EDS Summary Tab — beginning inventory loads from prior month; grey fields auto-calculate</p>
           </div>
           <div class="panel-head-actions">
             <button class="btn btn-ghost btn-sm" onclick="loadSampleData()">Load Sample Data</button>
           </div>
         </div>
         <div class="panel-body">
+          <!-- FL Inventory -->
+          <div class="state-panel state-active" id="inv-fl">
           <div class="inv-tabs">
             <div class="inv-tab active" onclick="switchInvTab('bulk', this)">Bulk Spirits</div>
             <div class="inv-tab" onclick="switchInvTab('bottling', this)">Bottling Activity</div>
@@ -1393,7 +1723,7 @@ hr.div { border: none; border-top: 1.5px solid var(--border-lt); margin: 18px 0;
               </div>
             </div>
             <hr class="div" />
-            <p style="font-size:13px;font-weight:600;color:var(--dark);margin-bottom:12px;">Taxable Categories (Wine Gallons) — §565.12 F.S.</p>
+            <p style="font-size:13px;font-weight:600;color:var(--dark);margin-bottom:12px;" id="taxCatHeader">Taxable Categories (Wine Gallons) — §565.12 F.S.</p>
             <div class="form-grid g3">
               <div class="field">
                 <label>Under 17.259% ABV (Wine Gal)</label>
@@ -1452,6 +1782,90 @@ hr.div { border: none; border-top: 1.5px solid var(--border-lt); margin: 18px 0;
             </div>
           </div>
 
+          </div><!-- /inv-fl -->
+
+          <!-- CA Statement I — Inventory Reconciliation -->
+          <div class="state-panel" id="inv-ca">
+            <div class="ca-note">
+              <strong>CDTFA-501-DS — Statement I: Distilled Spirits Inventory Reconciliation</strong><br>
+              Report finished, packaged distilled spirits only. All quantities in wine gallons. Two columns: Column A (100 proof and under) and Column B (over 100 proof). Lines 1–11 carry forward automatically where noted.
+            </div>
+            <div class="stmt-grid">
+              <div class="stmt-header">#</div>
+              <div class="stmt-header">Description</div>
+              <div class="stmt-header">Col A — 100 Proof &amp; Under (Wine Gal)</div>
+              <div class="stmt-header">Col B — Over 100 Proof (Wine Gal)</div>
+
+              <div class="stmt-row">
+                <div class="stmt-line-num">1</div>
+                <div class="stmt-label">Inventory, beginning of period<small>From prior period return, Line 11. Include on-premises and warehouse inventory.</small></div>
+                <div class="stmt-input"><input type="number" id="ca_s1_l1a" step="0.01" value="0" oninput="recalcCAStatement()" /></div>
+                <div class="stmt-input"><input type="number" id="ca_s1_l1b" step="0.01" value="0" oninput="recalcCAStatement()" /></div>
+              </div>
+              <div class="stmt-row">
+                <div class="stmt-line-num">2</div>
+                <div class="stmt-label">Received from own bottling / packaging department<small>From Schedule CDTFA-240-A totals</small></div>
+                <div class="stmt-input"><input type="number" id="ca_s1_l2a" step="0.01" value="0" oninput="recalcCAStatement()" /></div>
+                <div class="stmt-input"><input type="number" id="ca_s1_l2b" step="0.01" value="0" oninput="recalcCAStatement()" /></div>
+              </div>
+              <div class="stmt-row">
+                <div class="stmt-line-num">3</div>
+                <div class="stmt-label">Purchased from other CA licensed distilled spirits taxpayers<small>From Schedule CDTFA-241-A totals</small></div>
+                <div class="stmt-input"><input type="number" id="ca_s1_l3a" step="0.01" value="0" oninput="recalcCAStatement()" /></div>
+                <div class="stmt-input"><input type="number" id="ca_s1_l3b" step="0.01" value="0" oninput="recalcCAStatement()" /></div>
+              </div>
+              <div class="stmt-row">
+                <div class="stmt-line-num">4</div>
+                <div class="stmt-label">Imported into California<small>From Schedule CDTFA-242-A totals</small></div>
+                <div class="stmt-input"><input type="number" id="ca_s1_l4a" step="0.01" value="0" oninput="recalcCAStatement()" /></div>
+                <div class="stmt-input"><input type="number" id="ca_s1_l4b" step="0.01" value="0" oninput="recalcCAStatement()" /></div>
+              </div>
+              <div class="stmt-row">
+                <div class="stmt-line-num">5</div>
+                <div class="stmt-label">Returns from California retailers<small>Bottled / packaged spirits returned to you from in-state retailers</small></div>
+                <div class="stmt-input"><input type="number" id="ca_s1_l5a" step="0.01" value="0" oninput="recalcCAStatement()" /></div>
+                <div class="stmt-input"><input type="number" id="ca_s1_l5b" step="0.01" value="0" oninput="recalcCAStatement()" /></div>
+              </div>
+              <div class="stmt-row">
+                <div class="stmt-line-num">6</div>
+                <div class="stmt-label">Other receipts<small>Any other receipts not covered in lines 2–5</small></div>
+                <div class="stmt-input"><input type="number" id="ca_s1_l6a" step="0.01" value="0" oninput="recalcCAStatement()" /></div>
+                <div class="stmt-input"><input type="number" id="ca_s1_l6b" step="0.01" value="0" oninput="recalcCAStatement()" /></div>
+              </div>
+              <div class="stmt-row subtotal">
+                <div class="stmt-line-num">7</div>
+                <div class="stmt-label">Total inventory available (Lines 1–6)</div>
+                <div class="stmt-input auto" id="ca_s1_l7a">0.00</div>
+                <div class="stmt-input auto" id="ca_s1_l7b">0.00</div>
+              </div>
+              <div class="stmt-row">
+                <div class="stmt-line-num">8</div>
+                <div class="stmt-label">Total sales of distilled spirits<small>All sales during the reporting period — taxable and exempt combined</small></div>
+                <div class="stmt-input"><input type="number" id="ca_s1_l8a" step="0.01" value="0" oninput="recalcCAStatement()" /></div>
+                <div class="stmt-input"><input type="number" id="ca_s1_l8b" step="0.01" value="0" oninput="recalcCAStatement()" /></div>
+              </div>
+              <div class="stmt-row">
+                <div class="stmt-line-num">9</div>
+                <div class="stmt-label">Losses (unaccounted-for / unintentional destruction)<small>Cannot exceed 0.1% of total sales per Regulation 2550. Document per CDTFA instructions.</small></div>
+                <div class="stmt-input"><input type="number" id="ca_s1_l9a" step="0.01" value="0" oninput="recalcCAStatement()" /></div>
+                <div class="stmt-input"><input type="number" id="ca_s1_l9b" step="0.01" value="0" oninput="recalcCAStatement()" /></div>
+              </div>
+              <div class="stmt-row">
+                <div class="stmt-line-num">10</div>
+                <div class="stmt-label">Other deductions<small>Destruction, transfers to bond, other authorized deductions with documentation</small></div>
+                <div class="stmt-input"><input type="number" id="ca_s1_l10a" step="0.01" value="0" oninput="recalcCAStatement()" /></div>
+                <div class="stmt-input"><input type="number" id="ca_s1_l10b" step="0.01" value="0" oninput="recalcCAStatement()" /></div>
+              </div>
+              <div class="stmt-row total">
+                <div class="stmt-line-num">11</div>
+                <div class="stmt-label">Inventory, end of period (Line 7 minus Lines 8–10)<small>Carry forward to next period return, Line 1</small></div>
+                <div class="stmt-input auto" id="ca_s1_l11a" style="color:var(--gold);">0.00</div>
+                <div class="stmt-input auto" id="ca_s1_l11b" style="color:var(--gold);">0.00</div>
+              </div>
+            </div>
+            <p style="font-size:11.5px;color:var(--muted);margin-top:12px;font-style:italic;">Semi-annual physical inventory required per Regulation 2530. Keep records on premises for CDTFA auditor verification.</p>
+          </div><!-- /inv-ca -->
+
         </div>
       </div>
     </section>
@@ -1469,6 +1883,7 @@ hr.div { border: none; border-top: 1.5px solid var(--border-lt); margin: 18px 0;
           </div>
         </div>
         <div class="panel-body">
+          <!-- Shared stat cards -->
           <div class="stat-grid">
             <div class="stat-card">
               <div class="s-label">Transactions</div>
@@ -1492,6 +1907,8 @@ hr.div { border: none; border-top: 1.5px solid var(--border-lt); margin: 18px 0;
             </div>
           </div>
 
+          <!-- FL Tax Breakdown -->
+          <div class="state-panel state-active" id="tax-fl">
           <div class="tax-breakdown">
             <div class="tax-row" style="background:var(--parch2);">
               <div style="font-family:'Space Mono',monospace;font-size:10px;text-transform:uppercase;letter-spacing:0.06em;color:var(--dark);font-weight:600;">Tax Category</div>
@@ -1518,12 +1935,91 @@ hr.div { border: none; border-top: 1.5px solid var(--border-lt); margin: 18px 0;
               <div class="tax-due" id="tr-high-due">$0.00</div>
             </div>
             <div class="tax-row total-row">
-              <div>Total Florida Excise Tax Due This Period</div>
+              <div id="fl-tax-total-label">Total Florida Excise Tax Due This Period</div>
               <div></div>
               <div></div>
               <div class="tax-due" id="tr-total">$0.00</div>
             </div>
           </div>
+
+          </div><!-- /tax-breakdown-fl -->
+          </div><!-- /tax-fl -->
+
+          <!-- CA Tax Computation -->
+          <div class="state-panel" id="tax-ca">
+            <div class="ca-note" style="margin-bottom:16px;">
+              <strong>CDTFA-501-DS Statement II — Tax Computation</strong><br>
+              Tax is due on net taxable sales to in-state retailers and consumer sales by craft distillers. Sales to other licensed CA manufacturers, wholesalers, importers, and exports are exempt and deducted below.
+            </div>
+            <div class="tax-breakdown">
+              <div class="tax-row" style="background:var(--parch2);">
+                <div style="font-family:'Space Mono',monospace;font-size:10px;text-transform:uppercase;letter-spacing:0.06em;color:var(--dark);font-weight:600;">Line</div>
+                <div style="font-family:'Space Mono',monospace;font-size:10px;text-transform:uppercase;letter-spacing:0.06em;color:var(--dark);font-weight:600;">Description</div>
+                <div style="font-family:'Space Mono',monospace;font-size:10px;text-transform:uppercase;letter-spacing:0.06em;color:var(--dark);font-weight:600;text-align:right;">Col A — ≤100 Proof</div>
+                <div style="font-family:'Space Mono',monospace;font-size:10px;text-transform:uppercase;letter-spacing:0.06em;color:var(--dark);font-weight:600;text-align:right;">Col B — &gt;100 Proof</div>
+              </div>
+              <div class="tax-row">
+                <div class="tax-label" style="font-family:'Space Mono',monospace;font-size:11px;color:var(--copper-dk);">14</div>
+                <div class="tax-label">Total sales (from Stmt I, Line 8)<small>Gross taxable + exempt sales combined</small></div>
+                <div class="tax-gal"><input type="number" id="ca_t_l14a" step="0.01" value="0" style="width:90px;border:1px solid var(--border);border-radius:4px;padding:4px 6px;font-family:'Space Mono',monospace;font-size:12px;" oninput="recalcCATax()" /></div>
+                <div class="tax-gal"><input type="number" id="ca_t_l14b" step="0.01" value="0" style="width:90px;border:1px solid var(--border);border-radius:4px;padding:4px 6px;font-family:'Space Mono',monospace;font-size:12px;" oninput="recalcCATax()" /></div>
+              </div>
+              <div class="tax-row">
+                <div class="tax-label" style="font-family:'Space Mono',monospace;font-size:11px;color:var(--copper-dk);">15</div>
+                <div class="tax-label">Returns from CA retailers (from Stmt I, Line 5)</div>
+                <div class="tax-gal"><input type="number" id="ca_t_l15a" step="0.01" value="0" style="width:90px;border:1px solid var(--border);border-radius:4px;padding:4px 6px;font-family:'Space Mono',monospace;font-size:12px;" oninput="recalcCATax()" /></div>
+                <div class="tax-gal"><input type="number" id="ca_t_l15b" step="0.01" value="0" style="width:90px;border:1px solid var(--border);border-radius:4px;padding:4px 6px;font-family:'Space Mono',monospace;font-size:12px;" oninput="recalcCATax()" /></div>
+              </div>
+              <div class="tax-row" style="background:var(--parch);">
+                <div class="tax-label" style="font-family:'Space Mono',monospace;font-size:11px;color:var(--copper-dk);">16</div>
+                <div class="tax-label" style="font-weight:600;">Net sales (Line 14 minus Line 15)</div>
+                <div class="tax-gal" id="ca_t_l16a" style="font-family:'Space Mono',monospace;text-align:right;">0.00</div>
+                <div class="tax-gal" id="ca_t_l16b" style="font-family:'Space Mono',monospace;text-align:right;">0.00</div>
+              </div>
+              <div class="tax-row">
+                <div class="tax-label" style="font-family:'Space Mono',monospace;font-size:11px;color:var(--copper-dk);">17</div>
+                <div class="tax-label">Exempt: sales to other CA licensees<small>From Schedule CDTFA-243-B totals</small></div>
+                <div class="tax-gal"><input type="number" id="ca_t_l17a" step="0.01" value="0" style="width:90px;border:1px solid var(--border);border-radius:4px;padding:4px 6px;font-family:'Space Mono',monospace;font-size:12px;" oninput="recalcCATax()" /></div>
+                <div class="tax-gal"><input type="number" id="ca_t_l17b" step="0.01" value="0" style="width:90px;border:1px solid var(--border);border-radius:4px;padding:4px 6px;font-family:'Space Mono',monospace;font-size:12px;" oninput="recalcCATax()" /></div>
+              </div>
+              <div class="tax-row">
+                <div class="tax-label" style="font-family:'Space Mono',monospace;font-size:11px;color:var(--copper-dk);">18</div>
+                <div class="tax-label">Exempt: exports / common carriers / armed forces<small>From Schedule CDTFA-244-B totals</small></div>
+                <div class="tax-gal"><input type="number" id="ca_t_l18a" step="0.01" value="0" style="width:90px;border:1px solid var(--border);border-radius:4px;padding:4px 6px;font-family:'Space Mono',monospace;font-size:12px;" oninput="recalcCATax()" /></div>
+                <div class="tax-gal"><input type="number" id="ca_t_l18b" step="0.01" value="0" style="width:90px;border:1px solid var(--border);border-radius:4px;padding:4px 6px;font-family:'Space Mono',monospace;font-size:12px;" oninput="recalcCATax()" /></div>
+              </div>
+              <div class="tax-row">
+                <div class="tax-label" style="font-family:'Space Mono',monospace;font-size:11px;color:var(--copper-dk);">19</div>
+                <div class="tax-label">Other exemptions (R&amp;TC §32053)<small>Attach supporting documentation</small></div>
+                <div class="tax-gal"><input type="number" id="ca_t_l19a" step="0.01" value="0" style="width:90px;border:1px solid var(--border);border-radius:4px;padding:4px 6px;font-family:'Space Mono',monospace;font-size:12px;" oninput="recalcCATax()" /></div>
+                <div class="tax-gal"><input type="number" id="ca_t_l19b" step="0.01" value="0" style="width:90px;border:1px solid var(--border);border-radius:4px;padding:4px 6px;font-family:'Space Mono',monospace;font-size:12px;" oninput="recalcCATax()" /></div>
+              </div>
+              <div class="tax-row" style="background:var(--parch);">
+                <div class="tax-label" style="font-family:'Space Mono',monospace;font-size:11px;color:var(--copper-dk);">20</div>
+                <div class="tax-label" style="font-weight:600;">Total exempt sales (Lines 17–19)</div>
+                <div class="tax-gal" id="ca_t_l20a" style="font-family:'Space Mono',monospace;text-align:right;">0.00</div>
+                <div class="tax-gal" id="ca_t_l20b" style="font-family:'Space Mono',monospace;text-align:right;">0.00</div>
+              </div>
+              <div class="tax-row" style="background:var(--parch);">
+                <div class="tax-label" style="font-family:'Space Mono',monospace;font-size:11px;color:var(--copper-dk);">21</div>
+                <div class="tax-label" style="font-weight:600;">Taxable sales (Line 16 minus Line 20)</div>
+                <div class="tax-gal" id="ca_t_l21a" style="font-family:'Space Mono',monospace;text-align:right;">0.00</div>
+                <div class="tax-gal" id="ca_t_l21b" style="font-family:'Space Mono',monospace;text-align:right;">0.00</div>
+              </div>
+              <div class="tax-row" style="background:var(--parch);">
+                <div class="tax-label" style="font-family:'Space Mono',monospace;font-size:11px;color:var(--copper-dk);">22</div>
+                <div class="tax-label">Tax rate per wine gallon</div>
+                <div class="tax-rate" style="text-align:right;">$3.30</div>
+                <div class="tax-rate" style="text-align:right;">$6.60</div>
+              </div>
+              <div class="tax-row total-row">
+                <div style="font-family:'Space Mono',monospace;font-size:11px;">23</div>
+                <div>Total California Excise Tax Due (Line 21 × Line 22)</div>
+                <div class="tax-gal" id="ca_t_l23a" style="font-family:'Space Mono',monospace;text-align:right;color:var(--gold);">$0.00</div>
+                <div class="tax-gal" id="ca_t_tax_total" style="font-family:'Space Mono',monospace;text-align:right;color:var(--gold);font-size:18px;">$0.00</div>
+              </div>
+            </div>
+          </div><!-- /tax-ca -->
 
           <p style="font-size:11.5px;color:var(--muted);margin-top:12px;font-style:italic;">
             <span id="taxNoteText">Note: Tax rates shown are statutory rates per Ch. 564–565 F.S. Verify current rates with DBPR before remitting. Federal TTB taxes apply separately. Credits may reduce amount owed — click "View Credits" in EDS after uploading. Tax is calculated on wine gallons (total volume), not proof gallons.</span>
@@ -1636,30 +2132,39 @@ const STATE_CONFIG = {
 let activeState = 'fl';
 
 // ── State Switcher ──
+function closeStateSwitcher() {
+  document.getElementById('stateSwitcherBtn')?.classList.remove('open');
+  document.getElementById('stateDropdown')?.classList.remove('open');
+}
+
 function toggleStateSwitcher() {
   const btn = document.getElementById('stateSwitcherBtn');
   const dd  = document.getElementById('stateDropdown');
-  btn.classList.toggle('open');
-  dd.classList.toggle('open');
+  const isOpen = dd.classList.contains('open');
+  if (isOpen) {
+    closeStateSwitcher();
+  } else {
+    btn.classList.add('open');
+    dd.classList.add('open');
+  }
 }
 
 // Close dropdown when clicking outside
 document.addEventListener('click', function(e) {
   const sw = document.getElementById('stateSwitcher');
   if (sw && !sw.contains(e.target)) {
-    document.getElementById('stateSwitcherBtn')?.classList.remove('open');
-    document.getElementById('stateDropdown')?.classList.remove('open');
+    closeStateSwitcher();
   }
 });
 
 function switchState(stateKey) {
   if (stateKey === activeState) {
-    toggleStateSwitcher();
+    closeStateSwitcher();
     return;
   }
   if (transactions.length > 0) {
     if (!confirm('Switching states will clear all loaded transactions and reset the form. Continue?')) {
-      toggleStateSwitcher();
+      closeStateSwitcher();
       return;
     }
     transactions = [];
@@ -1675,26 +2180,25 @@ function switchState(stateKey) {
 
   // Header
   document.getElementById('activeStateName').textContent = cfg.name;
-  document.getElementById('headerReportName').textContent = cfg.reportName.replace(/&amp;/g,'&');
-  document.getElementById('headerFormRef').innerHTML = cfg.formRef;
-  document.getElementById('headerDueChip').textContent = cfg.dueChip;
-  document.getElementById('headerLicenseChip').textContent = cfg.licenseChip;
+  const hrn = document.getElementById('headerReportName'); if (hrn) hrn.textContent = cfg.reportName.replace(/&amp;/g,'&');
+  const hfr = document.getElementById('headerFormRef');    if (hfr) hfr.innerHTML = cfg.formRef;
+  const hdc = document.getElementById('headerDueChip');    if (hdc) hdc.textContent = cfg.dueChip;
+  const hlc = document.getElementById('headerLicenseChip');if (hlc) hlc.textContent = cfg.licenseChip;
 
   // Compliance sidebar
-  document.getElementById('complianceText').innerHTML = cfg.complianceText;
+  const ct = document.getElementById('complianceText'); if (ct) ct.innerHTML = cfg.complianceText;
 
   // General info
-  document.getElementById('licNumLabel').innerHTML = cfg.licNumLabel + ' <span class="req">*</span>';
-  document.getElementById('g_licnum').placeholder = cfg.licNumPlaceholder;
-  document.getElementById('licNumHint').textContent = cfg.licNumHint;
-  // Clear form fields
-  ['g_bizname','g_licnum','g_month','g_county','g_phone','g_address','g_submitter','g_title'].forEach(id => {
-    const el = document.getElementById(id);
-    if (el) el.value = '';
+  const lnl = document.getElementById('licNumLabel'); if (lnl) lnl.innerHTML = cfg.licNumLabel + ' <span class="req">*</span>';
+  const lni = document.getElementById('g_licnum');    if (lni) { lni.placeholder = cfg.licNumPlaceholder; lni.value = ''; }
+  const lnh = document.getElementById('licNumHint');  if (lnh) lnh.textContent = cfg.licNumHint;
+  // Clear other form fields
+  ['g_bizname','g_month','g_county','g_phone','g_address','g_submitter','g_title'].forEach(id => {
+    const el = document.getElementById(id); if (el) el.value = '';
   });
 
   // Tax panel
-  document.getElementById('taxPanelSub').textContent = cfg.taxPanelSub.replace(/&amp;/g,'&');
+  const tps = document.getElementById('taxPanelSub'); if (tps) tps.textContent = cfg.taxPanelSub.replace(/&amp;/g,'&');
   cfg.taxTiers.forEach(tier => {
     const labelEl = document.getElementById('tr-' + tier.id + '-label');
     if (labelEl) labelEl.innerHTML = tier.label + '<small>' + tier.sub + '</small>';
@@ -1703,14 +2207,13 @@ function switchState(stateKey) {
     const hintEl = document.getElementById('cat-' + tier.id + '-hint');
     if (hintEl) hintEl.textContent = tier.hint;
   });
-  document.getElementById('bottlingTaxNote').innerHTML = cfg.bottlingTaxNote;
-  document.getElementById('taxCatHeader').textContent = cfg.taxCatHeader.replace(/&amp;/g,'&');
-  document.getElementById('caseGoodsNote').innerHTML = cfg.caseGoodsNote;
-  document.getElementById('taxNoteText').textContent = cfg.taxNote.replace(/&amp;/g,'&');
+  const btn = document.getElementById('bottlingTaxNote'); if (btn) btn.innerHTML = cfg.bottlingTaxNote;
+  const tch = document.getElementById('taxCatHeader');    if (tch) tch.textContent = cfg.taxCatHeader.replace(/&amp;/g,'&');
+  const cgn = document.getElementById('caseGoodsNote');   if (cgn) cgn.innerHTML = cfg.caseGoodsNote;
+  const tnt = document.getElementById('taxNoteText');      if (tnt) tnt.textContent = cfg.taxNote.replace(/&amp;/g,'&');
 
   // Transaction table header
-  const licHeader = document.getElementById('txn-lic-header');
-  if (licHeader) licHeader.textContent = cfg.txnHeaderLicense;
+  const licHeader = document.getElementById('txn-lic-header'); if (licHeader) licHeader.textContent = cfg.txnHeaderLicense;
 
   // Reset inventory fields
   ['b_begin','b_recv','b_distilled','b_to_bottling','b_to_case','b_loss',
@@ -1723,15 +2226,196 @@ function switchState(stateKey) {
   recalcCase();
   recalcTax();
 
+  // Reset CA fields when switching to FL
+  if (stateKey === 'fl') {
+    ['ca_s1_l1a','ca_s1_l1b','ca_s1_l2a','ca_s1_l2b','ca_s1_l3a','ca_s1_l3b',
+     'ca_s1_l4a','ca_s1_l4b','ca_s1_l5a','ca_s1_l5b','ca_s1_l6a','ca_s1_l6b',
+     'ca_s1_l8a','ca_s1_l8b','ca_s1_l9a','ca_s1_l9b','ca_s1_l10a','ca_s1_l10b',
+     'ca_t_l14a','ca_t_l14b','ca_t_l15a','ca_t_l15b','ca_t_l17a','ca_t_l17b',
+     'ca_t_l18a','ca_t_l18b','ca_t_l19a','ca_t_l19b'].forEach(id => {
+      const el = document.getElementById(id); if (el) el.value = '0';
+    });
+  }
+
+  // Toggle all state panels
+  const panels = ['ingest-fl','ingest-ca','txnref-fl','inv-fl','inv-ca','tax-fl','tax-ca'];
+  panels.forEach(pid => {
+    const el = document.getElementById(pid);
+    if (!el) return;
+    const isCurrentState = pid.endsWith('-' + stateKey);
+    el.classList.toggle('state-active', isCurrentState);
+  });
+
+  // Inventory panel title/sub
+  const invTitle = document.getElementById('inv-panel-title');
+  const invSub   = document.getElementById('inv-panel-sub');
+  if (stateKey === 'ca') {
+    if (invTitle) invTitle.textContent = 'Statement I — Inventory Reconciliation';
+    if (invSub)   invSub.textContent   = 'CDTFA-501-DS — Finished packaged spirits only, wine gallons, two proof columns';
+  } else {
+    if (invTitle) invTitle.textContent = 'Inventory Summary';
+    if (invSub)   invSub.textContent   = 'EDS Summary Tab — beginning inventory loads from prior month; grey fields auto-calculate';
+  }
+
+  // Stat card sub-label for due date
+  const dueSub = document.getElementById('st-tax')?.closest('.stat-card')?.querySelector('.s-sub');
+  if (dueSub) dueSub.textContent = stateKey === 'ca' ? 'Due by 15th of month' : 'Due by 10th of month';
+
   // Close dropdown & show toast
-  document.getElementById('stateSwitcherBtn')?.classList.remove('open');
-  document.getElementById('stateDropdown')?.classList.remove('open');
+  closeStateSwitcher();
   toast('Switched to ' + cfg.name + ' reporting');
 }
 
 // ───────────────────────────────────────────────
-// STATE
+// CA SCHEDULE TAB SWITCHER
 // ───────────────────────────────────────────────
+function switchSchedule(name, el) {
+  el.closest('.state-panel').querySelectorAll('.schedule-tab').forEach(t => t.classList.remove('active'));
+  el.closest('.state-panel').querySelectorAll('.schedule-pane').forEach(p => p.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('sched-' + name).classList.add('active');
+}
+
+// ───────────────────────────────────────────────
+// CA SCHEDULE RECORD ENTRY
+// ───────────────────────────────────────────────
+function addCASchedule(sched) {
+  const msgId = 'msg-' + sched;
+  let rec = {};
+  let valid = true;
+  const req = (id, label) => {
+    const val = document.getElementById(id)?.value?.trim();
+    if (!val) { showMsg(msgId, 'err', label + ' is required'); valid = false; }
+    return val;
+  };
+
+  if (sched === '240a') {
+    rec = { schedule:'240-A', owner:req('ca240_owner','Owner name'), date:req('ca240_date','Date'),
+      street:document.getElementById('ca240_street').value, city:document.getElementById('ca240_city').value,
+      low:parseFloat(document.getElementById('ca240_low').value)||0, high:parseFloat(document.getElementById('ca240_high').value)||0 };
+    if (!valid) return;
+    rec.description = `Own Bottling — ${rec.owner}`;
+    rec.invoice_number = `240A-${rec.date}`; rec.invoice_date = rec.date;
+  } else if (sched === '241a') {
+    rec = { schedule:'241-A', seller:req('ca241_seller','Seller name'), city:req('ca241_city','Seller city'),
+      acct:req('ca241_acct','CDTFA account'), recv_date:req('ca241_recvdate','Date received'),
+      inv_num:req('ca241_invnum','Invoice number'), inv_date:req('ca241_invdate','Invoice date'),
+      low:parseFloat(document.getElementById('ca241_low').value)||0, high:parseFloat(document.getElementById('ca241_high').value)||0 };
+    if (!valid) return;
+    rec.description = `CA Purchase — ${rec.seller}`;
+    rec.invoice_number = rec.inv_num; rec.invoice_date = rec.inv_date;
+  } else if (sched === '242a') {
+    rec = { schedule:'242-A', shipper:req('ca242_shipper','Shipper name'), state:req('ca242_state','Shipper state'),
+      carrier:req('ca242_carrier','Carrier name'), mode:document.getElementById('ca242_mode').value,
+      waybill:req('ca242_waybill','Waybill number'), waybill_date:document.getElementById('ca242_waybilldate').value,
+      recv_date:req('ca242_recvdate','Date received'), inv_num:req('ca242_invnum','Invoice number'),
+      purch_from:document.getElementById('ca242_purchfrom').value,
+      low:parseFloat(document.getElementById('ca242_low').value)||0, high:parseFloat(document.getElementById('ca242_high').value)||0 };
+    if (!valid) return;
+    rec.description = `Import — ${rec.shipper} (${rec.state})`;
+    rec.invoice_number = rec.inv_num; rec.invoice_date = rec.waybill_date || rec.recv_date;
+  } else if (sched === '243b') {
+    rec = { schedule:'243-B', sold_to:req('ca243_soldto','Sold to'), city:req('ca243_city','Delivery city'),
+      acct:req('ca243_acct','CDTFA account'), inv_num:req('ca243_invnum','Invoice number'),
+      inv_date:req('ca243_invdate','Invoice date'), ship_date:req('ca243_shipdate','Date shipped'),
+      low:parseFloat(document.getElementById('ca243_low').value)||0, high:parseFloat(document.getElementById('ca243_high').value)||0 };
+    if (!valid) return;
+    rec.description = `Exempt Sale (243-B) — ${rec.sold_to}`;
+    rec.invoice_number = rec.inv_num; rec.invoice_date = rec.inv_date;
+  } else if (sched === '244b') {
+    rec = { schedule:'244-B', sold_to:req('ca244_soldto','Sold/shipped to'),
+      exemption_type:document.getElementById('ca244_type').value,
+      inv_num:req('ca244_invnum','Invoice number'), inv_date:req('ca244_invdate','Invoice date'),
+      low:parseFloat(document.getElementById('ca244_low').value)||0, high:parseFloat(document.getElementById('ca244_high').value)||0 };
+    if (!valid) return;
+    rec.description = `${rec.exemption_type} — ${rec.sold_to}`;
+    rec.invoice_number = rec.inv_num; rec.invoice_date = rec.inv_date;
+  }
+
+  const gallons = (rec.low||0) + (rec.high||0);
+  transactions.push({
+    report_section: 'cdtfa_' + sched,
+    transaction_type: rec.schedule,
+    fl_license: rec.acct || '',
+    supplier_name: rec.seller || rec.shipper || rec.sold_to || rec.owner || '',
+    invoice_number: rec.invoice_number || '',
+    invoice_date: rec.invoice_date || '',
+    gallons: gallons,
+    proof: 0,
+    notes: rec.description,
+    ca_low: rec.low || 0,
+    ca_high: rec.high || 0,
+  });
+
+  showMsg(msgId, 'ok', `Added ${rec.schedule} — ${gallons.toFixed(2)} wine gal`);
+  renderTransactions();
+  recalcCATax();
+}
+
+// ───────────────────────────────────────────────
+// CA STATEMENT I — INVENTORY RECONCILIATION
+// ───────────────────────────────────────────────
+function recalcCAStatement() {
+  const g = id => parseFloat(document.getElementById(id)?.value) || 0;
+  const s = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val.toFixed(2); };
+
+  const l7a = g('ca_s1_l1a')+g('ca_s1_l2a')+g('ca_s1_l3a')+g('ca_s1_l4a')+g('ca_s1_l5a')+g('ca_s1_l6a');
+  const l7b = g('ca_s1_l1b')+g('ca_s1_l2b')+g('ca_s1_l3b')+g('ca_s1_l4b')+g('ca_s1_l5b')+g('ca_s1_l6b');
+  s('ca_s1_l7a', l7a); s('ca_s1_l7b', l7b);
+
+  const l11a = l7a - g('ca_s1_l8a') - g('ca_s1_l9a') - g('ca_s1_l10a');
+  const l11b = l7b - g('ca_s1_l8b') - g('ca_s1_l9b') - g('ca_s1_l10b');
+  s('ca_s1_l11a', l11a); s('ca_s1_l11b', l11b);
+
+  // Push Line 8 totals into the tax section placeholders as hints
+  const l14a = document.getElementById('ca_t_l14a');
+  const l14b = document.getElementById('ca_t_l14b');
+  if (l14a) l14a.placeholder = 'Stmt I Line 8: ' + g('ca_s1_l8a').toFixed(2);
+  if (l14b) l14b.placeholder = 'Stmt I Line 8: ' + g('ca_s1_l8b').toFixed(2);
+
+  recalcCATax();
+}
+
+// ───────────────────────────────────────────────
+// CA STATEMENT II — TAX COMPUTATION
+// ───────────────────────────────────────────────
+function recalcCATax() {
+  const g = id => parseFloat(document.getElementById(id)?.value) || 0;
+  const s = (id, val, dollar) => {
+    const el = document.getElementById(id);
+    if (el) el.textContent = dollar ? '$' + val.toFixed(2) : val.toFixed(2);
+  };
+
+  const l14a = g('ca_t_l14a'), l14b = g('ca_t_l14b');
+  const l15a = g('ca_t_l15a'), l15b = g('ca_t_l15b');
+  const l16a = l14a - l15a, l16b = l14b - l15b;
+  s('ca_t_l16a', l16a); s('ca_t_l16b', l16b);
+
+  const l17a = g('ca_t_l17a'), l17b = g('ca_t_l17b');
+  const l18a = g('ca_t_l18a'), l18b = g('ca_t_l18b');
+  const l19a = g('ca_t_l19a'), l19b = g('ca_t_l19b');
+  const l20a = l17a + l18a + l19a, l20b = l17b + l18b + l19b;
+  s('ca_t_l20a', l20a); s('ca_t_l20b', l20b);
+
+  const l21a = Math.max(0, l16a - l20a), l21b = Math.max(0, l16b - l20b);
+  s('ca_t_l21a', l21a); s('ca_t_l21b', l21b);
+
+  const tax_a = l21a * 3.30, tax_b = l21b * 6.60;
+  const total = tax_a + tax_b;
+  s('ca_t_l23a', tax_a, true);
+  s('ca_t_tax_total', total, true);
+
+  if (activeState === 'ca') {
+    const totalWine = l21a + l21b;
+    document.getElementById('st-txns').textContent = transactions.length;
+    document.getElementById('st-bulk').textContent = (g('ca_s1_l2a') + g('ca_s1_l2b')).toFixed(3);
+    document.getElementById('st-wine').textContent = totalWine.toFixed(3);
+    document.getElementById('st-tax').textContent  = '$' + total.toFixed(2);
+  }
+  return total;
+}
+
+
 let transactions = [];
 let pendingHeaders = [];
 let pendingRows = [];
